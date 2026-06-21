@@ -81,14 +81,7 @@ app.include_router(broadcast.router)
 # Health check
 # ---------------------------------------------------------------------------
 
-@app.get("/", tags=["Health"])
-async def health_check():
-    """Root endpoint — confirms the server is running."""
-    return {
-        "status": "healthy",
-        "service": "Multi-Tenant WhatsApp AI Agent",
-        "version": "1.0.0",
-    }
+
 
 
 @app.get("/health", tags=["Health"])

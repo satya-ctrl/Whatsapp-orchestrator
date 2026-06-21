@@ -68,7 +68,7 @@ export default function HomePage({ onEnterDashboard }) {
         <nav className="flex items-center gap-1 bg-[#070b0a]/50 backdrop-blur-md border border-white/10 rounded-full px-2 py-1.5 pointer-events-auto">
           {[
             { label: 'PROJECTS', href: '#' },
-            { label: 'API DOCS', href: 'http://localhost:8000/docs' },
+            { label: 'API DOCS', href: '/docs' },
             { label: 'ABOUT',    href: '#' },
           ].map((item) => (
             <a key={item.label} href={item.href} target="_blank" rel="noreferrer"
