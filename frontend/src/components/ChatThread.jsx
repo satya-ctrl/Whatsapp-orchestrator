@@ -42,11 +42,11 @@ export default function ChatThread({ messages, conversation, isTyping }) {
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8"
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 sm:px-8"
         style={{ background: 'radial-gradient(ellipse at center, rgba(37,211,102,0.03) 0%, transparent 70%)' }}
       >
-        <div className="w-16 h-16 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center">
-          <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center">
+          <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
@@ -65,28 +65,28 @@ export default function ChatThread({ messages, conversation, isTyping }) {
     <div className="flex flex-col h-full">
 
       {/* Thread Header */}
-      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between flex-shrink-0"
+      <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-white/5 flex items-center justify-between flex-shrink-0 gap-2"
         style={{ background: 'rgba(255,255,255,0.02)' }}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white text-xs font-bold">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">
             {conversation.customer_phone?.replace(/\D/g, '').slice(-2)}
           </div>
-          <div>
-            <p className="text-sm font-semibold text-white">{conversation.customer_phone}</p>
-            <p className="text-[11px] text-white/35">
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-semibold text-white truncate">{conversation.customer_phone}</p>
+            <p className="text-[10px] sm:text-[11px] text-white/35 truncate">
               Started {new Date(conversation.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
         </div>
-        <div className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+        <div className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold border whitespace-nowrap flex-shrink-0 ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
           {statusStyle.label}
         </div>
       </div>
 
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto custom-scrollbar px-5 py-4 space-y-0.5"
+        className="flex-1 overflow-y-auto custom-scrollbar px-3 sm:px-5 py-3 sm:py-4 space-y-0.5"
         style={{
           background: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), transparent`,
         }}

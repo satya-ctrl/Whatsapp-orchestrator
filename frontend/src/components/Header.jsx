@@ -31,7 +31,11 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
   const handleDropdownToggle = () => {
     if (dropdownRef.current && !dropdownOpen) {
       const rect = dropdownRef.current.getBoundingClientRect();
-      setDropdownCoords({ top: rect.bottom + 8, left: rect.left });
+      const isMobile = window.innerWidth < 640;
+      setDropdownCoords({
+        top: rect.bottom + 8,
+        left: isMobile ? 12 : rect.left,
+      });
     }
     setDropdownOpen(!dropdownOpen);
   };
@@ -42,19 +46,19 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
   return (
     <>
       {isTimeSlipping && <LokiTimeSlip onComplete={onBackToHome} />}
-      <header className="relative w-[95%] mx-auto z-50 mb-5">
-      <div className="glass-panel px-5 py-3.5 flex items-center justify-between rounded-2xl">
+      <header className="relative w-full sm:w-[95%] mx-auto z-50 mb-3 sm:mb-5">
+      <div className="glass-panel px-3 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between rounded-2xl gap-2">
 
         {/* ── Tenant Switcher ── */}
-        <div className="relative z-[9999]" ref={dropdownRef}>
+        <div className="relative z-[9999] min-w-0 flex-shrink" ref={dropdownRef}>
           <button
             onClick={handleDropdownToggle}
             id="tenant-switcher"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 hover:bg-white/5 group"
+            className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-xl transition-all duration-200 hover:bg-white/5 group min-w-0"
           >
             {/* Avatar */}
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, ${activeColor.from}, ${activeColor.to})`,
                 boxShadow: `0 0 12px ${activeColor.glow}`,
@@ -62,14 +66,14 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
             >
               {activeTenantData?.name?.charAt(0) || '?'}
             </div>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-white leading-tight">
+            <div className="text-left min-w-0 hidden xs:block sm:block">
+              <p className="text-xs sm:text-sm font-semibold text-white leading-tight truncate">
                 {activeTenantData?.name || 'Select Tenant'}
               </p>
               <p className="text-[10px] text-white/40 leading-tight">Active Workspace</p>
             </div>
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              className={`text-white/40 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}>
+              className={`text-white/40 transition-transform duration-200 flex-shrink-0 ${dropdownOpen ? 'rotate-180' : ''}`}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -78,7 +82,7 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
           {dropdownOpen && createPortal(
             <div 
               id="portal-dropdown"
-              className="fixed w-72 glass-panel p-2 animate-fade-in z-[999999] rounded-xl"
+              className="fixed w-[calc(100vw-24px)] sm:w-72 glass-panel p-2 animate-fade-in z-[999999] rounded-xl"
               style={{ top: dropdownCoords.top, left: dropdownCoords.left }}
             >
               <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-white/30">
@@ -126,10 +130,11 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
           )}
         </div>
 
+        {/* Center logo — hidden on mobile to save space */}
         <div 
           id="header-logo" 
           onClick={() => setIsTimeSlipping(true)}
-          className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 select-none cursor-pointer group"
+          className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-3 select-none cursor-pointer group"
         >
           <Logo className="w-10 h-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform duration-300" />
           <div className="flex flex-col justify-center">
@@ -146,7 +151,7 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
         <button
           id="broadcast-trigger"
           onClick={onBroadcastClick}
-          className="group relative flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm text-white transition-all duration-300 overflow-hidden"
+          className="group relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm text-white transition-all duration-300 overflow-hidden flex-shrink-0"
           style={{
             background: 'linear-gradient(135deg, rgba(0,132,255,0.2), rgba(0,96,204,0.2))',
             border: '1px solid rgba(0,132,255,0.3)',
@@ -154,11 +159,12 @@ export default function Header({ tenants, activeTenant, onTenantChange, onBroadc
           onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 20px rgba(0,132,255,0.3)'}
           onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
         >
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:scale-110 transition-transform">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:scale-110 transition-transform flex-shrink-0">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
           </svg>
-          <span className="tracking-wide text-[13px]">Launch Broadcast</span>
+          <span className="tracking-wide text-[12px] sm:text-[13px] hidden xs:inline sm:inline">Broadcast</span>
+          <span className="tracking-wide text-[12px] sm:text-[13px] xs:hidden sm:hidden">📢</span>
         </button>
       </div>
     </header>

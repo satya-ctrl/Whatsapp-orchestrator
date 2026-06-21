@@ -8,13 +8,13 @@ import { ArrowLeft, MessageSquare, AlertTriangle, CheckCircle2 } from 'lucide-re
 
 function StatCard({ icon, label, value, color }) {
   return (
-    <div className="glass-panel-dense px-4 py-3 flex items-center gap-3 rounded-xl">
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
+    <div className="glass-panel-dense px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2.5 sm:gap-3 rounded-xl min-w-0">
+      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
         {icon}
       </div>
-      <div>
-        <p className="text-[11px] text-white/40 leading-none mb-0.5">{label}</p>
-        <p className="text-lg font-bold text-white leading-none">{value}</p>
+      <div className="min-w-0">
+        <p className="text-[10px] sm:text-[11px] text-white/40 leading-none mb-0.5 truncate">{label}</p>
+        <p className="text-base sm:text-lg font-bold text-white leading-none">{value}</p>
       </div>
     </div>
   );
@@ -66,6 +66,13 @@ export default function Dashboard({ onBackToHome }) {
   const escalated  = conversations.filter(c => c.status === 'NEEDS_HUMAN').length;
   const resolved   = conversations.filter(c => c.status === 'RESOLVED').length;
 
+  // Mobile: go back to contact list when back is pressed in chat
+  const handleMobileBack = () => {
+    setActiveConversation(null);
+    setMessages([]);
+    setConversationData(null);
+  };
+
   return (
     <div className="relative min-h-screen bg-[#080c10] text-white overflow-x-hidden">
       {/* Background — matching HomePage HLS video */}
@@ -74,18 +81,18 @@ export default function Dashboard({ onBackToHome }) {
         <div className="absolute inset-0 bg-gradient-to-r from-[#070b0a] via-[#070b0a]/70 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#070b0a] via-[#070b0a]/50 to-transparent" />
         <div 
-          className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] md:w-[900px] h-[300px] rounded-[100%] bg-[#5ed29c]/15"
+          className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] md:w-[900px] h-[200px] sm:h-[300px] rounded-[100%] bg-[#5ed29c]/15"
           style={{ filter: 'blur(30px)' }}
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-[1600px] mx-auto pt-6 px-4 pb-6 flex flex-col h-screen">
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto pt-4 sm:pt-6 px-3 sm:px-4 pb-4 sm:pb-6 flex flex-col h-screen">
 
         {/* Back Button */}
-        <div className="w-[95%] mx-auto mb-3">
+        <div className="w-full sm:w-[95%] mx-auto mb-2 sm:mb-3">
           <button
             onClick={onBackToHome}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-bold tracking-wider text-white transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-[11px] sm:text-[12px] font-bold tracking-wider text-white transition-all hover:scale-105 active:scale-95"
             style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)' }}
           >
             <ArrowLeft size={14} />
@@ -102,7 +109,7 @@ export default function Dashboard({ onBackToHome }) {
         />
 
         {/* Stats bar */}
-        <div className="w-[95%] mx-auto mb-4 flex items-center gap-3">
+        <div className="w-full sm:w-[95%] mx-auto mb-3 sm:mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
           <StatCard
             icon={<MessageSquare size={14} className="text-white/60" />}
             label="Total" value={total}
@@ -125,13 +132,13 @@ export default function Dashboard({ onBackToHome }) {
             label="Resolved" value={resolved}
             color="bg-meta-blue/10"
           />
-          <div className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/3 border border-white/6">
+          <div className="ml-auto hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/3 border border-white/6">
             <span className="w-1.5 h-1.5 rounded-full bg-wa-green animate-pulse" />
             <span className="text-[11px] text-white/40 font-medium">Live</span>
           </div>
         </div>
 
-        <main className="flex-1 w-[95%] mx-auto pb-2 min-h-0 relative z-0">
+        <main className="flex-1 w-full sm:w-[95%] mx-auto pb-2 min-h-0 relative z-0">
           <ChatMonitor
             conversations={conversations}
             activeConversation={activeConversation}
@@ -139,6 +146,7 @@ export default function Dashboard({ onBackToHome }) {
             conversationData={conversationData}
             isTyping={isTyping}
             onSelectConversation={setActiveConversation}
+            onMobileBack={handleMobileBack}
           />
         </main>
       </div>

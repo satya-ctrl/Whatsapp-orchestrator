@@ -75,9 +75,8 @@ export default function BroadcastDrawer({ isOpen, onClose, tenantId }) {
 
       {/* Drawer — flex column, full height, footer always at bottom */}
       <div
-        className="fixed top-0 right-0 h-full z-50 flex flex-col"
+        className="fixed top-0 right-0 h-full z-50 flex flex-col w-full sm:w-[420px]"
         style={{
-          width: 420,
           background: 'linear-gradient(180deg, #0d1117 0%, #0a1014 100%)',
           borderLeft: '1px solid rgba(255,255,255,0.09)',
           boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
