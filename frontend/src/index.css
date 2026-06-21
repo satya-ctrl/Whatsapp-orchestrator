@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@700&family=Instrument+Serif:ital@1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────
+   Animated Grid Background
+───────────────────────────────────────────────── */
+@keyframes grid-scroll {
+  0%   { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+.animated-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: grid-scroll 6s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────
+   Liquid Glass Card Component
+───────────────────────────────────────────────── */
+.liquid-glass-card {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  border-radius: 24px;
+}
+
+.liquid-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1.4px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.02));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────
+   Design Tokens
+───────────────────────────────────────────────── */
+:root {
+  --bg-base:        #080c10;
+  --bg-surface:     #0d1117;
+  --bg-surface-2:   #161b22;
+  --bg-surface-3:   #1e2530;
+  --border:         rgba(255,255,255,0.07);
+  --border-bright:  rgba(255,255,255,0.14);
+  --wa-green:       #25D366;
+  --wa-green-dark:  #128C7E;
+  --meta-blue:      #0084FF;
+  --text-primary:   #f0f6fc;
+  --text-secondary: rgba(240,246,252,0.6);
+  --text-muted:     rgba(240,246,252,0.35);
+}
+
+/* ─────────────────────────────────────────────────
+   Base Reset
+───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────
+   Glass Panels
+───────────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+.glass-panel-dense {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.liquid-glass {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 12px rgba(0,0,0,0.3);
+}
+
+/* ─────────────────────────────────────────────────
+   Chat Bubbles
+───────────────────────────────────────────────── */
+.bubble-user {
+  background: #005c4b;
+  color: #e9edef;
+  border-radius: 12px 2px 12px 12px;
+  padding: 10px 14px;
+  max-width: 75%;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.bubble-bot {
+  background: #202c33;
+  color: #e9edef;
+  border-radius: 2px 12px 12px 12px;
+  padding: 10px 14px;
+  max-width: 75%;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* ─────────────────────────────────────────────────
+   Status Dots
+───────────────────────────────────────────────── */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-active {
+  background: #25D366;
+  box-shadow: 0 0 6px rgba(37,211,102,0.8);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.status-responding {
+  background: #0084FF;
+  box-shadow: 0 0 6px rgba(0,132,255,0.8);
+  animation: pulse-glow-blue 2s ease-in-out infinite;
+}
+
+.status-needs-human {
+  background: #f87171;
+  box-shadow: 0 0 6px rgba(248,113,113,0.8);
+  animation: pulse-glow-red 2s ease-in-out infinite;
+}
+
+.status-resolved {
+  background: #4b5563;
+  box-shadow: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(37,211,102,0.6); }
+  50%       { box-shadow: 0 0 12px rgba(37,211,102,1); }
+}
+@keyframes pulse-glow-blue {
+  0%, 100% { box-shadow: 0 0 4px rgba(0,132,255,0.6); }
+  50%       { box-shadow: 0 0 12px rgba(0,132,255,1); }
+}
+@keyframes pulse-glow-red {
+  0%, 100% { box-shadow: 0 0 4px rgba(248,113,113,0.6); }
+  50%       { box-shadow: 0 0 12px rgba(248,113,113,1); }
+}
+
+/* ─────────────────────────────────────────────────
+   Contact List Item
+───────────────────────────────────────────────── */
+.contact-item {
+  transition: all 0.18s ease;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  border-radius: 10px;
+}
+
+.contact-item:hover:not(.active) {
+  background: rgba(255,255,255,0.04);
+}
+
+.contact-item.active {
+  background: rgba(37,211,102,0.07);
+  border-left-color: var(--wa-green);
+  box-shadow: inset 4px 0 12px rgba(37,211,102,0.05);
+}
+
+/* ─────────────────────────────────────────────────
+   Custom Scrollbar
+───────────────────────────────────────────────── */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ─────────────────────────────────────────────────
+   Media Badges
+───────────────────────────────────────────────── */
+.media-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.media-badge-image {
+  background: rgba(37,211,102,0.15);
+  color: #25D366;
+  border: 1px solid rgba(37,211,102,0.2);
+}
+.media-badge-pdf {
+  background: rgba(248,113,113,0.12);
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.2);
+}
+
+/* ─────────────────────────────────────────────────
+   Animations
+───────────────────────────────────────────────── */
+@keyframes fade-in-up {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-from-right {
+  0%   { opacity: 0; transform: translateX(24px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
+  40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+.animate-fade-in      { animation: fade-in-up 0.3s ease-out forwards; }
+.animate-slide-right  { animation: slide-from-right 0.25s ease-out forwards; }
+.animate-bounce-dot   { animation: bounce-dot 1.4s ease-in-out infinite; }
+
+/* ─────────────────────────────────────────────────
+   Gradient Text Utility
+───────────────────────────────────────────────── */
+.text-gradient-green {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-blue {
+  background: linear-gradient(135deg, #4DA3FF, #0084FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
