@@ -33,9 +33,14 @@ COPY backend/ ./backend/
 # Copy built frontend from Stage 1 into the location expected by main.py
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Expose port (Cloud Run uses 8080 by default, but we can set it via env)
+# Set environment variables for Python and Port
 ENV PORT=8080
+ENV PYTHONPATH=/app/backend
+
+# Switch to backend directory so Python easily finds the 'app' module
+WORKDIR /app/backend
+
 EXPOSE $PORT
 
-# Command to run the FastAPI app
-CMD ["sh", "-c", "cd backend && uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+# Command to run the FastAPI app (using shell form to evaluate $PORT)
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
