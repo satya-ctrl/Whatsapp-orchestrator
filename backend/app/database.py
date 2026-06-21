@@ -80,7 +80,7 @@ SEED_TENANTS = [
         "media_library": [
             {
                 "keyword": "catalog",
-                "url": "https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table-word.pdf",
+                "url": "https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf",
                 "type": "document",
                 "mime_type": "application/pdf",
                 "filename": "LuxeLiving_Catalog_2025.pdf",
