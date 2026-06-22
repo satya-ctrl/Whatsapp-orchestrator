@@ -21,7 +21,7 @@ def get_llm(temperature: float = 0.3) -> ChatGoogleGenerativeAI:
     settings = get_settings()
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+        model="gemini-1.5-flash",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0.4,  # slightly creative but highly grounded
         max_retries=2,
