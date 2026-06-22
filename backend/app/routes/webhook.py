@@ -158,6 +158,24 @@ async def _process_message(message_data: dict) -> None:
     """
     try:
         db = get_db()
+        customer_phone = message_data["customer_phone"]
+        message_text = message_data.get("message_text", "").strip()
+
+        # Check for manual tenant switch commands (useful for testing with 1 phone number)
+        if message_text.lower() == "/tenant a":
+            target_tenant = "tenant-a-luxury-furniture"
+            await db.conversations.update_many(
+                {"customer_phone": customer_phone},
+                {"$set": {"tenant_id": target_tenant}}
+            )
+            logger.info(f"Switched {customer_phone} to {target_tenant}")
+        elif message_text.lower() == "/tenant b":
+            target_tenant = "tenant-b-automotive-care"
+            await db.conversations.update_many(
+                {"customer_phone": customer_phone},
+                {"$set": {"tenant_id": target_tenant}}
+            )
+            logger.info(f"Switched {customer_phone} to {target_tenant}")
 
         # Resolve tenant from the phone_number_id in the webhook payload.
         # First try matching by whatsapp_phone_number_id,
@@ -173,7 +191,7 @@ async def _process_message(message_data: dict) -> None:
         if not tenant:
             # Fallback: check if there's a conversation already for this phone number
             existing_conv = await db.conversations.find_one(
-                {"customer_phone": message_data["customer_phone"]}
+                {"customer_phone": customer_phone}
             )
             if existing_conv:
                 tenant = await db.tenants.find_one(
