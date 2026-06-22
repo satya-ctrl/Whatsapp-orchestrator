@@ -26,11 +26,7 @@ const FEATURES = [
   },
 ];
 
-const NAV_ITEMS = [
-  { label: 'PROJECTS', href: '#' },
-  { label: 'API DOCS', href: '/docs' },
-  { label: 'ABOUT',    href: '#' },
-];
+const NAV_ITEMS = [];
 
 export default function HomePage({ onEnterDashboard }) {
   const [isPopped, setIsPopped] = useState(false);
