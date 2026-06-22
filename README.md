@@ -1,96 +1,142 @@
 # Multi-Tenant Agentic WhatsApp Orchestrator
 
-An end-to-end cloud-native system for a Multi-Tenant WhatsApp AI Support & Sales Agent SaaS. 
+A cloud-native SaaS platform that allows multiple companies (tenants) to manage customer queries interactively over WhatsApp. Powered by **LangGraph**, **FastAPI**, **React**, and **MongoDB**.
 
-This platform allows multiple companies (tenants) to manage customer queries interactively over WhatsApp. It leverages **LangGraph** to process incoming text and media inquiries, send rich responses (images and documents), toggle WhatsApp's native typing indicators to reduce user drop-offs, and stores all conversations in a multi-tenant **MongoDB** database.
+## 🚀 Features
 
-## Architecture
+- **Multi-Tenant Architecture**: Supports multiple businesses, each with their own unique LLM system prompt and rich media library (images/PDFs).
+- **Agentic Orchestration (LangGraph)**: An intelligent pipeline that evaluates incoming messages, retrieves tenant context, and decides whether to send text or attach media dynamically.
+- **Asynchronous Webhooks**: Handles Meta's strict 3-second webhook timeout by instantly returning `200 OK` and processing LLM generations in background tasks.
+- **Rich Media & Native UX**: Dispatches WhatsApp text, images, and documents. Uses defensive programming for Meta API typing indicators to ensure smooth user experiences.
+- **Testing Convenience**: Built-in chat commands (`/tenant a` and `/tenant b`) allow testers to easily switch the active tenant context using a single WhatsApp test number!
+- **Real-Time Dashboard**: A React-based frontend for admins to monitor live chat threads, switch between tenants, and track agent activity.
 
-### LangGraph Agent Pipeline
-The core AI orchestration is built using a LangGraph state machine:
-1. **Acknowledge Node**: Instantly fires off the "read receipt" and "typing indicator" via the WhatsApp Cloud API, and saves the message to the database state.
-2. **Context Retriever Node**: Pulls the specific Tenant's prompt, media catalog rules, and the last 5 messages of chat history from MongoDB.
-3. **LLM Reasoning Node**: Invokes Gemini (Google) to determine the next conversational step. The agent can decide to reply with plain text or use the `send_media_asset` tool to attach a document or image from the Tenant's media library. If frustration is detected, it flags the conversation as `NEEDS_HUMAN`.
-4. **Dispatcher Node**: Constructs the appropriate WhatsApp payload, dispatches it, and records the outgoing response in the database, automatically extinguishing the typing indicator.
+---
 
-*(Webhook Inbound -> Acknowledge -> Context -> LLM Reasoning -> Dispatcher)*
+## ⚙️ Quick-Start: Environment Variables (`.env`)
 
-### Async Webhook Handler
-Built on **FastAPI**, the webhook returns a `200 OK` to Meta immediately upon receiving a message, preventing duplicate delivery retries. The LangGraph orchestration runs in a background task.
+Before running the application, you must configure the backend environment. 
 
-## Quick-Start Instructions
-
-### 1. Environment Setup
-Create a `.env` file in the `backend/` directory (see `backend/.env.example` for reference) with the following:
+1. Navigate to the `backend/` directory.
+2. Create a file named `.env` and populate it with the following keys:
 
 ```env
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017
+# MongoDB Configuration (Atlas or Local)
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority
 DATABASE_NAME=whatsapp_agent
 
 # Gemini AI Configuration
-GOOGLE_API_KEY=your-gemini-key
+GOOGLE_API_KEY=your_gemini_api_key_here
 
-# WhatsApp API Configuration
-WHATSAPP_API_TOKEN=your-whatsapp-api-token
-WHATSAPP_PHONE_NUMBER_ID=your-phone-number-id
+# WhatsApp / Meta Cloud API Configuration
+WHATSAPP_API_TOKEN=your_meta_system_user_token
+WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
 WEBHOOK_VERIFY_TOKEN=my-secret-token-123
-META_APP_SECRET=your-meta-app-secret
+META_APP_SECRET=your_app_secret (Optional: For signature validation)
 ```
 
-### 2. Run Local Environment
-You will need two terminals to run the frontend and backend locally.
+---
 
-**Backend (FastAPI):**
+## 🏃 Step-by-Step Instructions to Run Locally
+
+### 1. Backend Setup
+The backend runs on Python/FastAPI and uses Motor for async MongoDB connections.
+
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On Mac/Linux:
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+
+# Start the FastAPI server (Runs on port 8000)
+uvicorn app.main:app --reload
 ```
 
-**Frontend (React/Vite):**
+### 2. Frontend Setup
+The frontend is a React application built with Vite and TailwindCSS.
+
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Start the Vite development server (Runs on port 5173)
 npm run dev
 ```
-*(The frontend runs on http://localhost:3000)*
 
-### 3. Exposing Webhook (ngrok)
-To allow Meta to send events to your local backend:
+### 3. Exposing the Webhook (For Local Testing)
+To receive incoming messages from Meta, your local backend needs a public URL. You can use Cloudflare Tunnels (or ngrok).
 ```bash
-ngrok http 8000
+# Using cloudflared to expose port 8000
+cloudflared tunnel --url http://localhost:8000
 ```
-Update your Meta App Webhook configuration to point to your ngrok URL `https://<your-id>.ngrok-free.app/api/webhook`.
+*Copy the generated `https` URL and append `/api/webhooks/whatsapp`. Paste this into your Meta Developer Dashboard under "Webhooks".*
 
-## Deployment (GCP Cloud Run)
+---
 
-This project includes a multi-stage `Dockerfile` designed for deployment to **Google Cloud Run** as a single container.
+## 🧠 LangGraph Architecture Breakdown
 
-1. **Build the container:**
-   ```bash
-   docker build -t whatsapp-orchestrator .
-   ```
-2. **Push to Artifact Registry:**
-   ```bash
-   docker tag whatsapp-orchestrator gcr.io/<PROJECT_ID>/whatsapp-orchestrator
-   docker push gcr.io/<PROJECT_ID>/whatsapp-orchestrator
-   ```
-3. **Deploy to Cloud Run:**
-   Deploy the image and pass the required environment variables using GCP Secret Manager.
-   ```bash
-   gcloud run deploy whatsapp-orchestrator \
-     --image gcr.io/<PROJECT_ID>/whatsapp-orchestrator \
-     --platform managed \
-     --set-env-vars MONGODB_URI=...,DATABASE_NAME=whatsapp_agent,... \
-     --allow-unauthenticated
-   ```
-4. Update your Meta Webhook URL to point to the live Cloud Run URL.
+The core of the application is an intelligent, stateful orchestration graph built using **LangGraph**. It strictly controls how customer messages are acknowledged, evaluated, and answered.
 
-## Features
-- **Multi-Tenant Architecture**: Strict data isolation between brands.
-- **Cinematic Dashboard**: A "Liquid Glass" themed frontend monitor to audit conversations.
-- **Agentic Rich Media**: Autonomous dispatching of PDFs and Images via Gemini tool calls.
-- **Webhook Security**: `X-Hub-Signature-256` HMAC validation securing the inbound webhooks.
+### State Representation
+The graph operates on a shared `AgentState` dictionary passed between nodes:
+```python
+class AgentState(TypedDict):
+    customer_phone: str      # The user's WhatsApp number
+    tenant_id: str           # Which tenant the user is interacting with
+    message_text: str        # The raw incoming message
+    whatsapp_message_id: str # Meta's wamid for read receipts
+    context: dict            # Fetched tenant rules & media library
+    chat_history: list       # Previous 5 messages for context
+    agent_response: str      # The text generated by the LLM
+    selected_media: dict     # (Optional) Image/PDF selected by the tool
+    dispatch_success: bool   # Status of the final Meta API call
+```
+
+### Nodes and Edges
+When a webhook fires, the background task invokes the graph, flowing through these nodes:
+
+1. **Acknowledge Node (`acknowledge_message`)**:
+   - *Action*: Instantly sends a "Read Receipt" and triggers the "Typing..." indicator via the WhatsApp API.
+   - *Edge*: Proceeds automatically to `Context Retriever Node`.
+2. **Context Retriever Node (`retrieve_context`)**:
+   - *Action*: Connects to MongoDB to pull the specific Tenant's system prompt, media catalog, and the last 5 messages of the user's chat history.
+   - *Edge*: Proceeds automatically to `LLM Reasoning Node`.
+3. **LLM Reasoning Node (`agent_reasoning`)**:
+   - *Action*: Injects the context into the Gemini LLM. The LLM acts autonomously. It can choose to simply generate a text reply (`agent_response`), **or** if the user asked for visual assets (e.g., "show me the catalog"), it triggers a bound tool (`send_media_asset`).
+   - *Edge*: Proceeds automatically to `Dispatcher Node`.
+4. **Dispatcher Node (`dispatch_response`)**:
+   - *Action*: Analyzes the state. If `selected_media` is present, it constructs a rich media WhatsApp payload (Document/Image). If not, it constructs a standard text payload. It fires the message to Meta, extinguishes the typing indicator, and logs the outbound message to MongoDB.
+   - *Edge*: `END` (Pipeline terminates).
+
+---
+
+## ☁️ Deployment Environment & Setup Details
+
+This application is designed for containerized deployment using the provided `Dockerfile`. The preferred cloud hosting environment for this project is **Render** (or GCP Cloud Run).
+
+### Why Render?
+Render seamlessly supports building Docker containers directly from a connected GitHub repository and provides automatic HTTPS for secure webhook termination.
+
+### Deployment Configuration Steps (Render Example)
+1. **Push to GitHub**: Ensure your code is pushed to your `main` branch.
+2. **Create a Web Service**: In the Render Dashboard, create a new "Web Service" and connect your GitHub repository.
+3. **Environment Setup**: 
+   - **Build Command**: Render will automatically detect the `Dockerfile`.
+   - **Environment Variables**: Navigate to the "Environment" tab in Render and add ALL the variables from your `.env` file (e.g., `MONGODB_URI`, `GOOGLE_API_KEY`, `WHATSAPP_API_TOKEN`).
+   - **Port**: Expose port `8080` (as defined in the Dockerfile).
+4. **Deploy**: Render will build the image, start the container, and provide you with a live URL (e.g., `https://whatsapp-orchestrator-xxxx.onrender.com`).
+5. **Update Meta Webhooks**: 
+   - Go to your Meta Developer Dashboard.
+   - Update your Webhook Callback URL to: `https://whatsapp-orchestrator-xxxx.onrender.com/api/webhooks/whatsapp`
+   - Verify it using your `WEBHOOK_VERIFY_TOKEN`.
+
+The single `Dockerfile` uses a multi-stage build to compile the React frontend and serve it statically via the FastAPI backend, making it incredibly efficient for a single-service cloud deployment!
