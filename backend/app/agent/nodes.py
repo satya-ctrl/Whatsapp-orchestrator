@@ -234,7 +234,7 @@ async def llm_reasoning_node(state: AgentState) -> dict:
 
     # Parse the response
     response_text = response.content if isinstance(response.content, str) else ""
-    media_to_send = None
+    media_to_send = []
     needs_human = False
 
     # Check if the LLM made a tool call
@@ -252,13 +252,13 @@ async def llm_reasoning_node(state: AgentState) -> dict:
                         break
 
                 if matched_asset:
-                    media_to_send = {
+                    media_to_send.append({
                         "type": matched_asset["type"],
                         "url": matched_asset["url"],
                         "filename": matched_asset.get("filename", "attachment"),
                         "caption": matched_asset.get("description", ""),
                         "mime_type": matched_asset.get("mime_type", "application/octet-stream"),
-                    }
+                    })
                     logger.info(f"[LLM] Matched media asset: {matched_asset['keyword']}")
 
                     # If the LLM didn't provide text alongside the tool call,
@@ -286,7 +286,7 @@ async def llm_reasoning_node(state: AgentState) -> dict:
         )
         logger.info("[LLM] Frustration detected — escalating to human agent")
 
-    logger.info(f"[LLM] Response generated. Media: {media_to_send is not None}, Escalate: {needs_human}")
+    logger.info(f"[LLM] Response generated. Media count: {len(media_to_send)}, Escalate: {needs_human}")
 
     return {
         "response_text": response_text,
@@ -314,7 +314,7 @@ async def dispatcher_node(state: AgentState) -> dict:
     tenant_id = state["tenant_id"]
     conversation_id = state["conversation_id"]
     response_text = state.get("response_text", "")
-    media_to_send = state.get("media_to_send")
+    media_to_send_list = state.get("media_to_send", [])
     needs_human = state.get("needs_human", False)
 
     logger.info(f"[Dispatcher] Sending reply to {customer_phone}")
@@ -343,8 +343,8 @@ async def dispatcher_node(state: AgentState) -> dict:
                 "timestamp": datetime.now(timezone.utc),
             })
 
-        # Send media attachment if the LLM decided to include one
-        if media_to_send:
+        # Send media attachment(s) if the LLM decided to include any
+        for media_to_send in media_to_send_list:
             media_type = media_to_send["type"]
             if media_type == "image":
                 result = await whatsapp_client.send_image_message(

@@ -41,7 +41,7 @@ class AgentState(TypedDict, total=False):
 
     # --- Set by LLM Reasoning Node ---
     response_text: str            # The text reply from the LLM
-    media_to_send: Optional[MediaPayload]  # Media attachment (if LLM decided to send one)
+    media_to_send: list[MediaPayload]  # Media attachments (if LLM decided to send any)
     needs_human: bool             # Whether conversation should be escalated
 
     # --- Set by Dispatcher Node ---
