@@ -37,6 +37,13 @@ async def verify_webhook(
     token = params.get("hub.verify_token")
     challenge = params.get("hub.challenge")
 
+    # If accessed directly via a web browser (no query params)
+    if not mode or not token:
+        return {
+            "status": "online",
+            "message": "WhatsApp Webhook is active and listening! Provide this URL to your Meta Developer Portal."
+        }
+
     settings = get_settings()
 
     if mode == "subscribe" and token == settings.WEBHOOK_VERIFY_TOKEN:
