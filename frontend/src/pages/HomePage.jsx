@@ -26,11 +26,15 @@ const FEATURES = [
   },
 ];
 
-const NAV_ITEMS = [];
+const NAV_ITEMS = [
+  { label: 'API DOCS', href: '/docs' },
+  { label: 'ABOUT', action: 'about' },
+];
 
 export default function HomePage({ onEnterDashboard }) {
   const [isPopped, setIsPopped] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#070b0a] text-white overflow-x-hidden relative flex flex-col cursor-default select-none font-['Inter']">
@@ -70,8 +74,18 @@ export default function HomePage({ onEnterDashboard }) {
         {/* Desktop Nav */}
         <nav className="hidden sm:flex items-center gap-1 bg-[#070b0a]/50 backdrop-blur-md border border-white/10 rounded-full px-2 py-1.5">
           {NAV_ITEMS.map((item) => (
-            <a key={item.label} href={item.href} target="_blank" rel="noreferrer"
-              className="h-8 px-4 flex items-center text-[12px] font-semibold tracking-widest text-white/80 hover:text-[#5ed29c] rounded-full transition-all duration-200">
+            <a 
+              key={item.label} 
+              href={item.href || '#'} 
+              target={item.href ? "_blank" : undefined} 
+              rel={item.href ? "noreferrer" : undefined}
+              onClick={(e) => {
+                if (item.action === 'about') {
+                  e.preventDefault();
+                  setIsAboutOpen(true);
+                }
+              }}
+              className="h-8 px-4 flex items-center text-[12px] font-semibold tracking-widest text-white/80 hover:text-[#5ed29c] rounded-full transition-all duration-200 cursor-pointer">
               {item.label}
             </a>
           ))}
@@ -92,11 +106,17 @@ export default function HomePage({ onEnterDashboard }) {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
-              href={item.href}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-3 text-[13px] font-semibold tracking-widest text-white/80 hover:text-[#5ed29c] hover:bg-white/5 rounded-xl transition-all duration-200"
+              href={item.href || '#'}
+              target={item.href ? "_blank" : undefined}
+              rel={item.href ? "noreferrer" : undefined}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (item.action === 'about') {
+                  e.preventDefault();
+                  setIsAboutOpen(true);
+                }
+              }}
+              className="block px-4 py-3 text-[13px] font-semibold tracking-widest text-white/80 hover:text-[#5ed29c] hover:bg-white/5 rounded-xl transition-all duration-200 cursor-pointer"
             >
               {item.label}
             </a>
@@ -166,6 +186,59 @@ export default function HomePage({ onEnterDashboard }) {
           ))}
         </div>
       </main>
+      {/* About Architecture Modal */}
+      {isAboutOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            onClick={() => setIsAboutOpen(false)}
+          />
+          <div className="relative w-full max-w-3xl bg-[#0d1117] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl animate-fade-in overflow-hidden">
+            <button 
+              onClick={() => setIsAboutOpen(false)}
+              className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            <h2 className="text-2xl font-bold mb-2">Architecture Flow</h2>
+            <p className="text-white/60 mb-6 text-sm">How the Multi-Tenant Agentic Orchestrator processes messages using LangGraph.</p>
+            
+            <div className="bg-[#070b0a] rounded-xl p-4 sm:p-6 border border-white/5 font-mono text-[10px] sm:text-[12px] md:text-[14px] text-[#5ed29c] whitespace-pre overflow-x-auto">
+              {`       [WhatsApp Webhook Inbound]  
+                   │ 
+                   ▼ 
+       ┌───────────────────────────────────────┐ 
+       │   Acknowledge Node    │ ───► (Send Read & Typing On WhatsApp) 
+       └───────────────────────────────────────┘ 
+                   │ 
+                   ▼ 
+       ┌───────────────────────────────────────┐ 
+       │ Context Retriever Node│ ───► (Pull tenant rules & history) 
+       └───────────────────────────────────────┘ 
+                   │ 
+                   ▼ 
+       ┌───────────────────────────────────────┐ 
+       │  LLM Reasoning Node   │ ───► (Choose response type & assets) 
+       └───────────────────────────────────────┘ 
+                   │ 
+                   ▼ 
+       ┌───────────────────────────────────────┐ 
+       │    Dispatcher Node    │ ───► (Send Text/Image/Doc & Save State) 
+       └───────────────────────────────────────┘ `}
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => setIsAboutOpen(false)}
+                className="px-5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
