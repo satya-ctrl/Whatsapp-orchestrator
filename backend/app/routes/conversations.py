@@ -98,10 +98,10 @@ async def update_conversation_status(conversation_id: str, body: dict):
             detail=f"Invalid status. Must be one of: {valid_statuses}"
         )
 
-    from datetime import datetime
+    from datetime import datetime, timezone
     result = await db.conversations.update_one(
         {"conversation_id": conversation_id},
-        {"$set": {"status": new_status, "updated_at": datetime.utcnow()}}
+        {"$set": {"status": new_status, "updated_at": datetime.now(timezone.utc)}}
     )
 
     if result.matched_count == 0:

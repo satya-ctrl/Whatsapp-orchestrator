@@ -12,9 +12,14 @@ function getStatus(status) {
   return STATUS_CONFIG[status] || STATUS_CONFIG.WAITING_FOR_BOT;
 }
 
+function parseDate(ts) {
+  if (!ts) return new Date();
+  return new Date(ts.endsWith('Z') ? ts : `${ts}Z`);
+}
+
 function formatTime(ts) {
   if (!ts) return '';
-  const d   = new Date(ts);
+  const d   = parseDate(ts);
   const now = new Date();
   const diff = now - d;
   if (diff < 60000)    return 'just now';

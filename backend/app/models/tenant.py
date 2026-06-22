@@ -5,7 +5,7 @@ Each tenant has unique branding, system prompts, and a media library.
 
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 
@@ -35,8 +35,8 @@ class Tenant(BaseModel):
         default_factory=list,
         description="Pre-seeded media assets available for the agent to send"
     )
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def to_doc(self) -> dict:
         """Convert to MongoDB document."""

@@ -5,7 +5,7 @@ Stores text content, media attachments, and metadata.
 
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 
@@ -51,7 +51,7 @@ class Message(BaseModel):
         default=None,
         description="WhatsApp's message ID for tracking"
     )
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def to_doc(self) -> dict:
         """Convert to MongoDB document."""

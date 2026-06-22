@@ -8,7 +8,7 @@ Four nodes in the processing pipeline:
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 from app.agent.state import AgentState
@@ -70,7 +70,7 @@ async def acknowledge_node(state: AgentState) -> dict:
             {"conversation_id": conversation_id},
             {"$set": {
                 "status": ConversationStatus.AGENT_RESPONDING.value,
-                "updated_at": datetime.utcnow(),
+                "updated_at": datetime.now(timezone.utc),
             }}
         )
     else:
@@ -83,8 +83,8 @@ async def acknowledge_node(state: AgentState) -> dict:
             "customer_phone": customer_phone,
             "status": ConversationStatus.AGENT_RESPONDING.value,
             "context_variables": {},
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
         })
 
     # Save inbound message to audit log
@@ -99,7 +99,7 @@ async def acknowledge_node(state: AgentState) -> dict:
         "media": None,
         "message_type": "text",
         "whatsapp_message_id": wa_message_id,
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
     })
 
     logger.info(f"[Acknowledge] Message saved. Conversation: {conversation_id}")
@@ -340,7 +340,7 @@ async def dispatcher_node(state: AgentState) -> dict:
                 "media": None,
                 "message_type": "text",
                 "whatsapp_message_id": wa_msg_id,
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
             })
 
         # Send media attachment if the LLM decided to include one
@@ -380,7 +380,7 @@ async def dispatcher_node(state: AgentState) -> dict:
                 },
                 "message_type": media_type,
                 "whatsapp_message_id": wa_msg_id,
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
             })
 
     except Exception as e:
@@ -396,7 +396,7 @@ async def dispatcher_node(state: AgentState) -> dict:
         {"conversation_id": conversation_id},
         {"$set": {
             "status": new_status,
-            "updated_at": datetime.utcnow(),
+            "updated_at": datetime.now(timezone.utc),
         }}
     )
 

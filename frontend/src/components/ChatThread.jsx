@@ -8,13 +8,18 @@ const STATUS_STYLE = {
   RESOLVED:         { bg: 'bg-white/5',        text: 'text-white/40',      border: 'border-white/10',      label: 'Resolved' },
 };
 
+function parseDate(ts) {
+  if (!ts) return new Date();
+  return new Date(ts.endsWith('Z') ? ts : `${ts}Z`);
+}
+
 function formatTime(ts) {
   if (!ts) return '';
-  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return parseDate(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function DateSeparator({ timestamp }) {
-  const d = new Date(timestamp);
+  const d = parseDate(timestamp);
   const today = new Date();
   let label;
   if (d.toDateString() === today.toDateString()) label = 'Today';
@@ -75,7 +80,7 @@ export default function ChatThread({ messages, conversation, isTyping }) {
           <div className="min-w-0">
             <p className="text-xs sm:text-sm font-semibold text-white truncate">{conversation.customer_phone}</p>
             <p className="text-[10px] sm:text-[11px] text-white/35 truncate">
-              Started {new Date(conversation.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              Started {parseDate(conversation.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
         </div>
@@ -94,10 +99,10 @@ export default function ChatThread({ messages, conversation, isTyping }) {
         {messages.map((msg, idx) => {
           const isUser = msg.direction === 'inbound';
           const showSep = idx === 0 || (
-            new Date(msg.timestamp).toDateString() !== new Date(messages[idx - 1]?.timestamp).toDateString()
+            parseDate(msg.timestamp).toDateString() !== parseDate(messages[idx - 1]?.timestamp).toDateString()
           );
           const showTime = idx === 0 || (
-            new Date(msg.timestamp).getTime() - new Date(messages[idx - 1]?.timestamp).getTime() > 300000
+            parseDate(msg.timestamp).getTime() - parseDate(messages[idx - 1]?.timestamp).getTime() > 300000
           );
 
           return (
